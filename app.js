@@ -1,5 +1,8 @@
+const googleMapsClient = require('@google/maps').createClient({
+    key: 'AIzaSyDax2a-BS_uld_McpnSs-iWgtg_PgkVHi8'
+});
 const express = require('express')
-var elasticsearch = require('elasticsearch');
+const elasticsearch = require('elasticsearch');
 const mysql = require('mysql');
 const app = express()
 const port = 4433
@@ -18,7 +21,15 @@ connection.query('INSERT INTO configurations SET ?', configuration, (err, res) =
     console.log('Last insert ID:', res.insertId);
 });
 
-var client = new elasticsearch.Client({
+googleMapsClient.reverseGeocode({
+    latlng : {lat:"40.714224", lng:"-73.961452"}
+}, function(err, response) {
+    if (!err) {
+        console.log(response.json.results);
+    }
+});
+
+const client = new elasticsearch.Client({
     host: 'https://elastic:5t8e50MT30Pwbed6g5X2zVgk@474197f539d74ae980590eb60963a9f1.eu-central-1.aws.cloud.es.io:9243',
     log: 'trace'
 });
@@ -31,9 +42,9 @@ client.search({
         }
     }
 }).then(function (resp) {
-    var hits = resp.hits.hits;
+    const hits = resp.hits.hits;
     let response = "";
-    for (var i = 0; i < hits.length ; i++) {
+    for (let i = 0; i < hits.length ; i++) {
         response = response.concat("Type of event " + i + " is: " + hits[i]._source.Type + "\n")
     }
     app.get('/', (req, res) => res.send(response))
