@@ -18,7 +18,11 @@ client.search({
     }
 }).then(function (resp) {
     var hits = resp.hits.hits;
-    app.get('/', (req, res) => res.send('Hello World!'))
+    let response = "";
+    for (var i = 0; i < hits.length ; i++) {
+        response = response.concat("Type of event " + i + " is: " + hits[i]._source.Type + "\n")
+    }
+    app.get('/', (req, res) => res.send(response))
 
     app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 }, function (err) {
