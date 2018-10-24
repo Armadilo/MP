@@ -5,6 +5,11 @@ const express = require('express');
 const elasticsearch = require('elasticsearch');
 const mysql = require('mysql');
 const app = express();
+var bodyParser = require('body-parser');
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
 const port = 4433;
 const indexName = 'bf4ea23e-d770-11e8-b283-382c4ab4a532_discoveryindexkind'
 
