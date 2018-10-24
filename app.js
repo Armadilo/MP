@@ -2,6 +2,7 @@ const googleMapsClient = require('@google/maps').createClient({
     key: 'AIzaSyDax2a-BS_uld_McpnSs-iWgtg_PgkVHi8'
 });
 const express = require('express');
+const mediatags = require('./MediaTags.js');
 const elasticsearch = require('elasticsearch');
 const mysql = require('mysql');
 const app = express();
@@ -17,9 +18,13 @@ app.use(function(req, res, next) {
 });
 const port = 4433;
 const indexName = 'bf4ea23e-d770-11e8-b283-382c4ab4a532_discoveryindexkind'
+let matchingCategories;
 
+mediatags().then((r) => {
+    matchingCategories = r;
+    console.log(matchingCategories);
+});
 let response = "";
-
 
 const connection = mysql.createConnection({
     host: 'u28rhuskh0x5paau.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
@@ -84,6 +89,7 @@ client.search({
 });
 
 app.get('/', (req, res) => {
+    console.debug(matchingCategories);
     res.send(response);
 });
 
