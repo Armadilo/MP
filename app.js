@@ -201,3 +201,5 @@ const country_list = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", 
 const image_categories_list= ["Documents", "Money", "Weapons", "Drugs", "Nudity", "Face", "Screenshots", "SuspectedCSA", "Cars", "Handwritten", "Flags", "Maps", "Tattoos", "UnCategorized"];
 
 app.get('/optional-countries', (req, res) => res.send(country_list))
+
+module.exports = app;
