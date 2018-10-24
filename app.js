@@ -6,6 +6,7 @@ const mediatags = require('./MediaTags.js');
 const elasticsearch = require('elasticsearch');
 const mysql = require('mysql');
 const app = express();
+let visited_hostile_countries = {};
 var bodyParser = require('body-parser');
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -69,13 +70,22 @@ client.search({
     }
 }).then((resp) => {
     const buckets = resp.aggregations.map_geohash.buckets;
+    connection.query("SELECT name,percentage FROM hostile_countries", (err, result, fields) => {
+        if (err) throw err;
     for (let bucket of buckets) {
         let latlngs = bucket.geohash_centroid.location;
+        let hostile_countries = result;
         googleMapsClient.reverseGeocode({
             latlng: {lat: latlngs.lat, lng: latlngs.lon}
         }, (err, res) => {
             if (!err) {
-                response = response.concat("The location is : " + res.json.results[res.json.results.length - 1].formatted_address);
+                Object.keys(hostile_countries).forEach(function(key) {
+                    var row = hostile_countries[key];
+                    if (res.json.results[res.json.results.length - 1].formatted_address === row.name)
+                    {
+                        visited_hostile_countries[row.name] = row.percentage;
+                    }
+                });
                 //console.log(response.json.results);
             }
             else {
@@ -84,14 +94,14 @@ client.search({
             }
         });
     };
-},  (err) => {
+});},  (err) => {
     return res.send(err.message);
 });
 
 app.get('/', (req, res) => {
     let response = JSON.stringify({
         fulfillmentText: "This is a text response", fulfillmentMessages: [{Media: matchingCategories},
-            {Countries: ["Syria", "Jorden"]},
+            {Countries: visited_hostile_countries},
             {
                 Contacts: {
                     Name: "Daniel Summers",
